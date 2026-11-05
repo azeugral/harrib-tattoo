@@ -8,14 +8,14 @@
   (function () {
     var hero = $('#inicio'), canvas = $('#heroCanvas'), poster = $('#heroPoster');
     var A = innerWidth / innerHeight, formato = A >= 1.05 ? 'deitado' : A >= .62 ? 'alto' : 'pe';
-    poster.style.backgroundImage = 'url(assets/img/hero-' + formato + '.jpg)';
+    poster.style.backgroundImage = 'url(assets/img/hero-' + formato + '.jpg?v=60)';
     if (calmo) { canvas.remove(); return; }
     if (toque) {
       canvas.remove();
       var v = document.createElement('video');
       v.muted = true; v.loop = true; v.playsInline = true; v.autoplay = true; v.setAttribute('playsinline', ''); v.setAttribute('aria-hidden', 'true');
-      v.poster = 'assets/img/hero-' + formato + '.jpg';
-      v.src = 'assets/video/hero-' + formato + '.mp4';
+      v.poster = 'assets/img/hero-' + formato + '.jpg?v=60';
+      v.src = 'assets/video/hero-' + formato + '.mp4?v=60';
       poster.after(v);
       v.play().catch(function () {});
       return;
@@ -23,22 +23,27 @@
     var T;
     try { T = window.heroGL(canvas, []); } catch (e) { T = null; }
     if (!T) { canvas.remove(); return; }
-    var L = 'ecd', prontas = 0, f = 0, ini = 0, vis = true, ultimo = 0, pedido = 0;
+    var L = 'ecd', prontas = 0, tempo = 0, vis = true, ultimo = 0, pedido = 0, escala = 1, soma = 0, conta = 0;
     function mede() {
-      var d = Math.min(devicePixelRatio || 1, 2), w = Math.round(hero.clientWidth * d), h = Math.round(hero.clientHeight * d);
+      var d = Math.min(devicePixelRatio || 1, 2) * escala, w = Math.round(hero.clientWidth * d), h = Math.round(hero.clientHeight * d);
       /* limite de GPU: 4 MP bastam para o painel continuar nítido */
       var k = Math.min(1, Math.sqrt(4e6 / (w * h)));
       canvas.width = Math.round(w * k); canvas.height = Math.round(h * k);
     }
     function quadro(t) {
       pedido = requestAnimationFrame(quadro);
-      if (!vis || document.hidden) return;
-      if (t - ultimo < 1000 / 12 - 2) return;  /* 12 quadros por segundo, como anime */
-      ultimo = t;
-      if (!ini) ini = t;
-      var intro = Math.min(1, (t - ini) / 1400);
-      T.desenhar(f, intro < 1 ? intro : undefined);
-      if (intro >= 1) f = (f + 1) % 180;
+      if (!vis || document.hidden) { ultimo = 0; return; }
+      /* tempo real: anda na frequência da tela, sem trava de quadros */
+      var dt = ultimo ? Math.min(t - ultimo, 50) : 0;
+      ultimo = t; tempo += dt;
+      /* se a placa não der conta, baixa a resolução e mantém a fluidez */
+      if (dt) { soma += dt; conta++; }
+      if (conta === 45) {
+        if (soma / conta > 24 && escala > .5) { escala = Math.max(.5, escala - .15); mede(); }
+        soma = conta = 0;
+      }
+      var x = Math.min(1, tempo / 1600), intro = 1 - Math.pow(1 - x, 3);
+      T.desenhar((Math.max(0, tempo - 1600) / 1000 * 12) % 180, x < 1 ? intro : undefined);
     }
     function sobe(p, a, depois) {
       var i = new Image(); i.decoding = 'async';

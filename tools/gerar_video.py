@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-"""Grava o tríptico do hero quadro a quadro: dois MP4 (em pé e deitado) e os pôsteres. Laço de 180 quadros a 12 fps = 15 s.
-Uso: python tools/gerar_video.py"""
+"""Grava o tríptico do hero quadro a quadro: três MP4 (em pé, alto e deitado) e os pôsteres. Laço de 15 s a 60 fps = 900 quadros.
+Uso: python tools/gerar_video.py [pe alto deitado]"""
 import base64, subprocess, shutil
 from pathlib import Path
 from playwright.sync_api import sync_playwright
@@ -8,6 +8,7 @@ from playwright.sync_api import sync_playwright
 SITE = Path(__file__).resolve().parent.parent
 ffmpeg = shutil.which('ffmpeg')
 import sys
+FPS = 60
 FORMATOS = [f for f in [('pe', 780, 1688), ('alto', 960, 1280), ('deitado', 1440, 900)] if len(sys.argv) < 2 or f[0] in sys.argv[1:]]
 
 with sync_playwright() as p:
@@ -23,16 +24,16 @@ with sync_playwright() as p:
       const L='ecd';for(let p=0;p<3;p++)for(let a=0;a<3;a++){const i=new Image();i.src=imgs[L[p]+a];await i.decode();T.carrega(p,a,i)}}""", imgs)
     for nome, W, H in FORMATOS:
         mp4 = SITE / f'assets/video/hero-{nome}.mp4'
-        enc = subprocess.Popen([ffmpeg, '-y', '-loglevel', 'error', '-f', 'image2pipe', '-framerate', '12', '-c:v', 'mjpeg', '-i', '-',
-                                '-c:v', 'libx264', '-preset', 'slow', '-crf', '25', '-pix_fmt', 'yuv420p', '-profile:v', 'high', '-r', '12', '-movflags', '+faststart', '-an', str(mp4)], stdin=subprocess.PIPE)
+        enc = subprocess.Popen([ffmpeg, '-y', '-loglevel', 'error', '-f', 'image2pipe', '-framerate', str(FPS), '-c:v', 'mjpeg', '-i', '-',
+                                '-c:v', 'libx264', '-preset', 'slow', '-crf', '26', '-pix_fmt', 'yuv420p', '-profile:v', 'high', '-r', str(FPS), '-movflags', '+faststart', '-an', str(mp4)], stdin=subprocess.PIPE)
         g.evaluate(f"(()=>{{const c=document.getElementById('c');c.width={W};c.height={H}}})()")
-        for f in range(180):
-            d = g.evaluate(f"(T.desenhar({f}),document.getElementById('c').toDataURL('image/jpeg',.96))")
+        for f in range(15 * FPS):
+            d = g.evaluate(f"(T.desenhar({f * 12 / FPS}),document.getElementById('c').toDataURL('image/jpeg',.96))")
             raw = base64.b64decode(d.split(',', 1)[1])
             enc.stdin.write(raw)
-            if f == 12:
+            if f == FPS:
                 (SITE / f'assets/img/hero-{nome}.jpg').write_bytes(base64.b64decode(g.evaluate("document.getElementById('c').toDataURL('image/jpeg',.84)").split(',', 1)[1]))
-            if f % 60 == 0:
+            if f % 120 == 0:
                 print(nome, f, flush=True)
         enc.stdin.close(); enc.wait()
         print(mp4.name, round(mp4.stat().st_size / 1e6, 2), 'MB', flush=True)

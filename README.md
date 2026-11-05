@@ -1,7 +1,7 @@
 # Harrib Tattoo
 
 Prévia do site do Alisson (Harrib), tatuador de Curitiba: mangá, anime, cybertribal, floral e blackwork.
-O site é um tomo de mangá: tríptico em WebGL a 12 quadros por segundo, tinta da pele extraída em traço, arco de evolução lido da direita para a esquerda e orçamento que sai pronto para o WhatsApp ou o Direct.
+O site é um tomo de mangá: tríptico em WebGL que acompanha a frequência da tela (MP4 a 60 fps no toque), tinta da pele extraída em traço, arco de evolução lido da direita para a esquerda e orçamento que sai pronto para o WhatsApp ou o Direct.
 
 No ar: https://azeugral.github.io/harrib-tattoo/ (com `noindex` enquanto for prévia).
 
