@@ -1,0 +1,214 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Harrib Tattoo | Alisson, tatuador em Curitiba: mangá, anime e cybertribal</title>
+<meta name="description" content="Alisson, o Harrib, tatua mangá, anime, Junji Ito, cybertribal e floral na Black Blood, em Curitiba. Peça seu orçamento pelo WhatsApp ou Direct.">
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#09090a">
+<link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
+<meta property="og:title" content="Harrib Tattoo">
+<meta property="og:description" content="Mangá, anime, cybertribal e floral na pele. Curitiba, PR.">
+<meta property="og:image" content="https://azeugral.github.io/harrib-tattoo/assets/img/og.jpg?v=1">
+<meta property="og:url" content="https://azeugral.github.io/harrib-tattoo/">
+<meta property="og:type" content="website">
+<link rel="preload" href="assets/fonts/kaisei-800.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="assets/fonts/zen-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="assets/css/site.css?v={{V}}">
+<script>document.documentElement.classList.add('js')</script>
+</head>
+<body>
+{{SIMBOLO}}
+<a class="saltar" href="#trabalhos">Pular para os trabalhos</a>
+
+<header class="topo" id="topo">
+  <div class="topo-in">
+    <nav aria-label="Principal, esquerda"><a href="#trabalhos">Trabalhos</a><a href="#traco">Traço</a><a href="#evolucao">Evolução</a></nav>
+    <button class="menu-bt" id="abrirMenu" aria-expanded="false" aria-controls="gaveta">Menu</button>
+    <a class="marca" href="#inicio" aria-label="Harrib Tattoo, início">{{LOGO}}</a>
+    <nav class="dir" aria-label="Principal, direita"><a href="#alisson">Alisson</a><a href="#onde">Onde</a><a href="#orcamento">Orçamento</a></nav>
+    <a class="orc-bt" href="#orcamento">Orçamento</a>
+  </div>
+</header>
+
+<div class="gaveta" id="gaveta" hidden>
+  <button class="fechar" id="fecharMenu">Fechar</button>
+  <a href="#trabalhos">Trabalhos</a><a href="#traco">Traço</a><a href="#evolucao">Evolução</a><a href="#alisson">Alisson</a><a href="#orcamento">Orçamento</a><a href="#onde">Onde</a>
+</div>
+
+<main>
+<section class="hero" id="inicio" aria-label="Harrib Tattoo">
+  <div class="poster" id="heroPoster"></div>
+  <canvas id="heroCanvas" aria-hidden="true"></canvas>
+  <span class="jp-lado e" lang="ja">タトゥーは芸術だ</span>
+  <span class="jp-lado d" lang="ja">タトゥーは芸術だ</span>
+  <div class="hero-base">
+    <p class="lema"><span>PERSONAGENS</span><span>IDEIAS</span><span>HISTÓRIAS</span><span>NA PELE</span></p>
+    <div class="hero-c">
+      <h1 aria-label="Harrib Tattoo">{{LOGO}}</h1>
+      <p class="assina">TATTOO</p>
+      <p class="cidade">CURITIBA &bull; PR</p>
+      <div class="hero-bts"><a class="bt" href="#orcamento">Pedir orçamento</a><a class="bt fio" href="#trabalhos">Ver trabalhos</a></div>
+    </div>
+    <p class="lema d"><span>TRAÇO</span><span>ARTE</span><span>LIBERDADE</span><span>SEMPRE</span></p>
+  </div>
+</section>
+
+<div class="faixa" aria-hidden="true"><div class="faixa-t">{{FAIXA}}</div></div>
+
+<section class="papel sec" id="trabalhos">
+  <div class="quadro">
+    <div class="cab" data-rv>
+      <p class="jp" lang="ja">画風</p>
+      <h2>Estilos</h2>
+      <p>Do mangá de terror ao tribal cheio de espinho. Toque em um estilo para ver só ele.</p>
+    </div>
+    <div class="estilos">{{ESTILOS}}</div>
+
+    <div class="cab" data-rv id="ancoraGrade">
+      <p class="jp" lang="ja">作品</p>
+      <h2>Trabalhos</h2>
+    </div>
+    <div class="filtros" role="group" aria-label="Filtrar trabalhos">{{FILTROS}}</div>
+    <div class="grade" id="grade">{{CARDS}}</div>
+    <div class="mais"><button class="bt preto" id="verMais">Ver todos os trabalhos</button></div>
+  </div>
+</section>
+
+<span class="rasgo inv" aria-hidden="true"></span>
+<section class="sec traco" id="traco">
+  <div class="quadro">
+    <div class="cab" data-rv>
+      <p class="jp" lang="ja">線</p>
+      <h2>Sem a pele, só o traço</h2>
+      <p>Tiramos a tinta da foto para mostrar o desenho puro, como numa página de mangá. Arraste para comparar.</p>
+    </div>
+    <div class="palco">
+      <div class="comp" id="comp">
+        <img id="compTraco" src="assets/img/tinta/chrollo-traco.webp" alt="Traço da tatuagem sem a pele" draggable="false">
+        <div class="pele-c"><img id="compPele" src="assets/img/tinta/chrollo-pele.webp" alt="A mesma tatuagem na pele" draggable="false"></div>
+        <i class="fio"></i><i class="pega" aria-hidden="true">&harr;</i>
+        <span class="rot a">Pele</span><span class="rot b">Traço</span>
+        <input type="range" min="0" max="100" value="50" aria-label="Comparar pele e traço" id="compR">
+      </div>
+      <div class="escolhe" role="group" aria-label="Escolher tatuagem">{{ESCOLHE}}</div>
+    </div>
+  </div>
+</section>
+<span class="rasgo b" aria-hidden="true"></span>
+
+<section class="arco" id="evolucao">
+  <div class="arco-pin">
+    <div class="cab" data-rv>
+      <p class="jp" lang="ja">成長</p>
+      <h2>Arco de evolução</h2>
+      <p>O ano dele, contado nas próprias legendas. <span class="sentido">Como no mangá, lê da direita para a esquerda.</span></p>
+    </div>
+    <div class="pista" id="pista">{{ARCO}}</div>
+  </div>
+</section>
+
+<span class="rasgo inv" aria-hidden="true"></span>
+<section class="sec sobre" id="alisson">
+  <div class="duo">
+    <div class="ret" data-rv>
+      <img src="assets/img/alisson.webp" alt="Retrato de Alisson, o Harrib, em retícula de mangá" loading="lazy" width="1500" height="1667">
+      <span class="sfx" lang="ja" aria-hidden="true">ゴゴゴ</span>
+    </div>
+    <div class="tex" data-rv>
+      <p class="jp" lang="ja">人物</p>
+      <h2>Alisson, o Harrib</h2>
+      <p>Tatuador em Curitiba, atende na Black Blood. Leva para a pele o que ama no mangá e no anime: Junji Ito, Hunter × Hunter, Dragon Ball, Soul Eater. Também faz cybertribal, floral e freehand exclusivo para cada cliente.</p>
+      <p>O preto é cheio, o traço é limpo e cada composição é pensada para o lugar do corpo. Ele posta o que acertou e o que ainda quer melhorar, e isso aparece em cada trabalho novo.</p>
+      <div class="citacao">
+        <blockquote>A evolução para no momento em que meu esforço para.</blockquote>
+        <cite>Alisson, numa legenda de maio de 2026</cite>
+      </div>
+    </div>
+  </div>
+</section>
+<span class="rasgo" aria-hidden="true"></span>
+
+<section class="papel sec" id="maquina">
+  <div class="quadro">
+    <div class="cab" data-rv>
+      <p class="jp" lang="ja">制作</p>
+      <h2>Na máquina</h2>
+      <p>Vídeos reais, gravados logo depois das sessões.</p>
+    </div>
+    <div class="reels" id="reels">{{REELS}}</div>
+    <div class="falas" aria-label="O que dizem clientes e colegas">{{FALAS}}</div>
+  </div>
+</section>
+
+<section class="sec orc" id="orcamento">
+  <div class="cab" data-rv style="position:relative;z-index:1">
+    <p class="jp" lang="ja">お見積り</p>
+    <h2>Peça seu orçamento</h2>
+    <p>Conte a ideia, o lugar e o tamanho. A mensagem chega pronta para ele.</p>
+  </div>
+  <div class="orc-g">
+    <form class="form" id="form" novalidate>
+      <div class="campos">
+        <div class="campo"><label for="fNome">Seu nome</label><input id="fNome" name="nome" autocomplete="name" required></div>
+        <div class="campo"><label for="fLocal">Lugar do corpo</label>
+          <select id="fLocal" name="local"><option value="">Ainda não sei</option><option>Braço</option><option>Antebraço</option><option>Mão</option><option>Ombro</option><option>Peito</option><option>Costas</option><option>Costela</option><option>Coxa</option><option>Panturrilha</option><option>Outro lugar</option></select></div>
+        <div class="campo lg"><span class="nome-campo" id="lbEst">Estilo</span>
+          <div class="chips" role="group" aria-labelledby="lbEst" id="fEstilo">{{CHIPS}}</div></div>
+        <div class="campo lg"><label for="fIdeia">Sua ideia</label><textarea id="fIdeia" name="ideia" required placeholder="Personagem, cena, referência, o que você imaginou"></textarea></div>
+        <div class="campo"><label for="fTam">Tamanho aproximado</label><input id="fTam" name="tam" placeholder="Ex.: 15 cm"></div>
+        <div class="campo"><label for="fPrim">Primeira tatuagem?</label><select id="fPrim" name="prim"><option value="">Prefiro não dizer</option><option>Sim, é a primeira</option><option>Não, já tenho outras</option></select></div>
+      </div>
+      <p class="erro" id="fErro" role="alert" hidden></p>
+      <div class="form-bts">
+        <button class="bt preto" type="submit" id="fWhats">Enviar no WhatsApp</button>
+        <button class="bt fio-p" type="button" id="fDirect">Copiar e abrir o Direct</button>
+      </div>
+      <p class="nota">Tem foto de referência? Mande na conversa junto com a mensagem.</p>
+    </form>
+  </div>
+</section>
+
+<section class="sec onde" id="onde">
+  <div class="duo">
+    <div data-rv>
+      <p class="jp" lang="ja">場所</p>
+      <h2>Black Blood, Curitiba</h2>
+      <address>Rua Duque de Caxias, 306, casa 03<br>São Francisco, ao lado do Centro<br>Curitiba, PR</address>
+      <a class="bt fio" href="https://www.google.com/maps/search/?api=1&query=Rua+Duque+de+Caxias+306+Curitiba+PR" target="_blank" rel="noopener">Abrir no mapa</a>
+    </div>
+    <div class="perg" data-rv>
+      <details><summary>Dá para fazer um desenho só meu?</summary><p>Sim. Ele faz arte autoral e freehand, desenhado direto no corpo, para ser exclusivo de cada cliente.</p></details>
+      <details><summary>Só faz mangá e anime?</summary><p>Não. Também tem cybertribal, floral, traço fino e blackwork. Veja os filtros em Trabalhos.</p></details>
+      <details><summary>Faz tatuagem colorida?</summary><p>Faz trabalhos com cor, em especial vermelho, e peças delicadas de até 4 cores.</p></details>
+      <details><summary>É minha primeira tatuagem, tudo bem?</summary><p>Tudo. Já teve cliente que escolheu ele para a primeira. Conte isso no pedido de orçamento.</p></details>
+      <details><summary>Como sei o valor?</summary><p>O valor depende do tamanho, do lugar e do detalhe da arte. Mande a ideia pelo WhatsApp ou Direct e ele responde com o orçamento.</p></details>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer class="pe">
+  <p class="grande">GOOD TATTOOS BETTER PEOPLE</p>
+  <div class="lg" aria-hidden="true">{{LOGO}}</div>
+  <div class="links"><a href="https://www.instagram.com/harribtattoo_/" target="_blank" rel="noopener">Instagram @harribtattoo_</a><a href="https://wa.me/5541997875360" target="_blank" rel="noopener">WhatsApp (41) 99787-5360</a><a href="https://www.instagram.com/blackblood_ttt/" target="_blank" rel="noopener">Black Blood</a></div>
+  <p class="sig">Site por <a href="https://lrgz.com.br" target="_blank" rel="noopener">L R G Z</a></p>
+</footer>
+
+<div class="lb" id="lb" role="dialog" aria-modal="true" aria-label="Trabalho" hidden>
+  <button class="lb-x" id="lbX">Fechar</button>
+  <div class="lb-m" id="lbM"></div>
+  <div class="lb-t">
+    <h3 id="lbT"></h3><small id="lbN"></small>
+    <q id="lbQ"></q>
+    <a class="bt" id="lbO" href="#orcamento">Quero uma assim</a>
+    <p class="lb-cont" id="lbC"></p>
+  </div>
+</div>
+
+<script>window.HARRIB={{JSON}};</script>
+<script src="assets/js/hero.js?v={{V}}"></script>
+<script src="assets/js/site.js?v={{V}}"></script>
+</body>
+</html>
