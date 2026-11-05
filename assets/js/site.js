@@ -23,23 +23,33 @@
     poster.style.backgroundImage = 'url(assets/img/hero-' + formato + '.jpg?v=64)';
     if (calmo) { canvas.remove(); entra(); return; }
     if (toque) {
-      canvas.remove();
       var v = document.createElement('video');
       v.muted = true; v.loop = true; v.playsInline = true; v.autoplay = true; v.setAttribute('playsinline', ''); v.setAttribute('aria-hidden', 'true');
       v.poster = 'assets/img/hero-' + formato + '.jpg?v=64';
       v.src = 'assets/video/hero-' + formato + '.mp4?v=64';
       poster.style.backgroundSize = 'contain';
-      v.addEventListener('playing', entra);
+      /* o iOS em Modo de Pouca Energia recusa autoplay: sem botão de play, a mesma animação segue em WebGL */
+      var reserva = function () {
+        if (!canvas.parentNode) return;
+        v.remove();
+        canvas.style.visibility = 'hidden';
+        webgl(2600);
+      };
+      v.addEventListener('playing', function () { canvas.remove(); entra(); });
       poster.after(v);
-      v.play().catch(function () {});
-      return;
+      var tocar = v.play();
+      if (tocar) tocar.catch(function (e) { if (e && e.name !== 'AbortError') reserva(); });
+      setTimeout(function () { if (v.paused) reserva(); }, 1500);
+    } else {
+      webgl(0);
     }
+    function webgl(inicio) {
     var T;
     try { T = window.heroGL(canvas, []); } catch (e) { T = null; }
     if (!T) { canvas.remove(); return; }
-    var L = 'ecd', prontas = 0, tempo = 0, vis = true, ultimo = 0, pedido = 0, escala = 1, soma = 0, conta = 0;
+    var L = 'ecd', prontas = 0, tempo = inicio, vis = true, ultimo = 0, pedido = 0, escala = 1, soma = 0, conta = 0;
     function mede() {
-      hero.classList.toggle('curto', curto());
+      if (!toque) hero.classList.toggle('curto', curto());
       var d = Math.min(devicePixelRatio || 1, 2) * escala, w = Math.round(canvas.clientWidth * d), h = Math.round(canvas.clientHeight * d);
       /* limite de GPU: 4 MP bastam para o painel continuar nítido */
       var k = Math.min(1, Math.sqrt(4e6 / (w * h)));
@@ -59,6 +69,7 @@
       }
       var x = Math.min(1, tempo / 1600), intro = 1 - Math.pow(1 - x, 3);
       T.desenhar((Math.max(0, tempo - 1600) / 1000 * 12) % 180, x < 1 ? intro : undefined);
+      canvas.style.visibility = '';
     }
     function sobe(p, a, depois) {
       var i = new Image(); i.decoding = 'async';
@@ -78,6 +89,7 @@
         }
       });
     });
+    }
   })();
 
   /* ---------- topo e menu ---------- */
