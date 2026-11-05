@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-"""Grava o tríptico do hero quadro a quadro: três MP4 (em pé, alto e deitado) e os pôsteres. Laço de 15 s a 60 fps = 900 quadros.
-Uso: python tools/gerar_video.py [pe alto deitado]"""
+"""Grava o tríptico do hero quadro a quadro: três MP4 (página alta, página curta e tríptico deitado) e os pôsteres. Laço de 15 s a 60 fps = 900 quadros.
+Uso: python tools/gerar_video.py [pe curto deitado]"""
 import base64, subprocess, shutil
 from pathlib import Path
 from playwright.sync_api import sync_playwright
@@ -9,7 +9,7 @@ SITE = Path(__file__).resolve().parent.parent
 ffmpeg = shutil.which('ffmpeg')
 import sys
 FPS = 60
-FORMATOS = [f for f in [('pe', 780, 1688), ('alto', 960, 1280), ('deitado', 1440, 900)] if len(sys.argv) < 2 or f[0] in sys.argv[1:]]
+FORMATOS = [f for f in [('pe', 1020, 1500), ('curto', 1020, 1276), ('deitado', 1440, 900)] if len(sys.argv) < 2 or f[0] in sys.argv[1:]]
 
 with sync_playwright() as p:
     b = p.chromium.launch(channel='msedge', args=['--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist'])
@@ -25,7 +25,7 @@ with sync_playwright() as p:
     for nome, W, H in FORMATOS:
         mp4 = SITE / f'assets/video/hero-{nome}.mp4'
         enc = subprocess.Popen([ffmpeg, '-y', '-loglevel', 'error', '-f', 'image2pipe', '-framerate', str(FPS), '-c:v', 'mjpeg', '-i', '-',
-                                '-c:v', 'libx264', '-preset', 'slow', '-crf', '26', '-pix_fmt', 'yuv420p', '-profile:v', 'high', '-r', str(FPS), '-movflags', '+faststart', '-an', str(mp4)], stdin=subprocess.PIPE)
+                                '-c:v', 'libx264', '-preset', 'slow', '-crf', '23', '-pix_fmt', 'yuv420p', '-profile:v', 'high', '-r', str(FPS), '-movflags', '+faststart', '-an', str(mp4)], stdin=subprocess.PIPE)
         g.evaluate(f"(()=>{{const c=document.getElementById('c');c.width={W};c.height={H}}})()")
         for f in range(15 * FPS):
             d = g.evaluate(f"(T.desenhar({f * 12 / FPS}),document.getElementById('c').toDataURL('image/jpeg',.96))")

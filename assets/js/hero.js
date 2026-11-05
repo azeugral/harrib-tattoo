@@ -1,26 +1,17 @@
 /* Tríptico do topo: três painéis de mangá com as tatuagens reais.
-   O tempo é contínuo e acompanha a tela (60, 120, 144 Hz): as linhas de foco respiram, a arte aproxima devagar
-   e cada troca é uma espiral de nanquim. Tudo que oscila anda num círculo de ruído, então o laço de 15 s fecha
+   O tempo é contínuo e acompanha a tela (60, 120, 144 Hz): sobre o fundo preto, a arte aproxima devagar
+   e cada troca é uma espiral de nanquim. O que oscila anda num círculo de ruído, então o laço de 15 s fecha
    sem emenda, o mesmo do MP4. A unidade de f segue 1/12 s: f vai de 0 a 180. */
 (function () {
   var VS = 'attribute vec2 p;void main(){gl_Position=vec4(p,0.,1.);}';
   var FS = [
     'precision highp float;',
-    'uniform vec2 uR,uL,uZ;uniform float uBal,uTopo,uCt,uCb,uOt,uOb,uGut;',
+    'uniform vec2 uR,uL,uZ;uniform float uPag,uTopo,uCt,uCb,uOt,uOb,uGut;',
     'uniform vec3 uW;',
     'uniform sampler2D uA0,uB0,uA1,uB1,uA2,uB2;',
-    'const vec3 OSSO=vec3(.925,.90,.855);const vec3 NEGRO=vec3(.035,.035,.04);',
-    'float h1(float x){return fract(sin(x*127.1)*43758.5453);}',
+    'const vec3 OSSO=vec3(.925,.90,.855);const vec3 NEGRO=vec3(0.);',
     'float h2(vec2 v){return fract(sin(dot(v,vec2(127.1,311.7)))*43758.5453);}',
     'float n2(vec2 v){vec2 i=floor(v),f=fract(v);f=f*f*(3.-2.*f);return mix(mix(h2(i),h2(i+vec2(1,0)),f.x),mix(h2(i+vec2(0,1)),h2(i+vec2(1,1)),f.x),f.y);}',
-    /* linhas de foco: finas perto do centro, abrem para fora */
-    'float tempo(float k,float v){return clamp((n2(vec2(k*41.3,v)+uL)-.5)*1.9+.5,0.,1.);}',
-    'float foco(vec2 q){float a=atan(q.y,q.x)+uBal,r=length(q);',
-    ' float k=(a/6.28318+1.)*360.;float id=mod(floor(k),360.);float f=fract(k);float b=h1(id);',
-    ' float largura=.04+.42*tempo(b,3.);float ini=.72+1.0*tempo(b+.31,17.);',
-    ' float taper=smoothstep(ini,ini+.75,r);',
-    ' float l=smoothstep(largura*taper,largura*taper-.05-.02/max(r,.1),abs(f-.5));',
-    ' return l*taper*smoothstep(.2,.36,tempo(b+.67,29.));}',
     /* borda de painel desenhada à mão: o tremor de nanquim ondula devagar */
     'float tremor(float y){return (n2(vec2(y*9.,1.)+uL*.45)-.5)*.0052+(n2(vec2(y*31.,7.)+uL*.7)-.5)*.0026;}',
     /* espiral: 0 mostra a arte, 1 cobre tudo de preto */
@@ -32,45 +23,53 @@
     'vec3 painel(sampler2D A,sampler2D B,vec2 c,vec2 m,vec2 uv,float w,float s){',
     ' vec2 q=(uv-c)/m.y;',
     ' float bAsp=m.x/m.y;float tAsp=.74;',
-    ' vec2 cv=vec2(q.x/bAsp*(bAsp<tAsp?bAsp/tAsp:1.),q.y*(bAsp<tAsp?1.:tAsp/bAsp))*.88;',
-    ' vec2 ta=cv*uZ.x+vec2(0.,-.115),tb=cv*uZ.y+vec2(0.,-.115);',
+    ' vec2 cv=vec2(q.x/bAsp*(bAsp<tAsp?bAsp/tAsp:1.),q.y*(bAsp<tAsp?1.:tAsp/bAsp))*(uPag>.5?.98:.88);',
+    ' float oy=uPag>.5?(c.y>0.?.2:.03):-.115;vec2 ta=cv*uZ.x+vec2(0.,oy),tb=cv*uZ.y+vec2(0.,oy);',
     ' vec3 ca=texture2D(A,vec2(ta.x*.5+.5,.5-ta.y*.5)).rgb;vec3 cb=texture2D(B,vec2(tb.x*.5+.5,.5-tb.y*.5)).rgb;',
     ' float cob;vec3 c0;',
     ' if(w<.5){cob=espiral(q,w*2.,s);c0=ca;}else{cob=espiral(q,(1.-w)*2.,s+5.);c0=cb;}',
     ' return mix(c0,NEGRO,clamp(cob,0.,1.));}',
     'void main(){',
     ' vec2 uv=(gl_FragCoord.xy*2.-uR)/uR.y;float A=uR.x/uR.y;',
-    ' vec2 q=uv-vec2(0.,.1);',
-    ' float f=foco(q*vec2(1.,1.15));',
-    ' vec3 cor=NEGRO+(OSSO-NEGRO)*f*.62;',
-    /* geometria: gabaritos simétricos, inclinados como requadros */
-    ' float tt=clamp((uTopo-uv.y)/(uTopo+1.),0.,1.);',
-    ' float ci=mix(uCt,uCb,tt);float oe=mix(uOt,uOb,tt);',
-    ' float dx=abs(uv.x);float tr=tremor(uv.y);',
-    ' float topo=uTopo-(dx/uOt)*.055+(n2(vec2(uv.x*7.,4.)+uL*.45)-.5)*.006;',
-    ' float g=uGut;float px=2./uR.y;',
-    ' float dCen=ci-g*.5-dx+tr;',
-    ' float dLado=min(dx-(ci+g*.5)+tr,oe-dx+tr);',
-    ' float dT=topo-uv.y;',
+    ' vec3 cor=NEGRO;',
+    /* tríptico (deitado) ou página de mangá (em pé): quadro grande em cima, dois embaixo, os três inteiros */
+    ' float dx=abs(uv.x);float tr=tremor(uv.y);float g=uGut;float px=2./uR.y;',
+    ' float dCen,dLado,dT;vec2 cC,mC,cL,mL;',
+    ' if(uPag<.5){',
+    '  float tt=clamp((uTopo-uv.y)/(uTopo+1.),0.,1.);',
+    '  float ci=mix(uCt,uCb,tt);float oe=mix(uOt,uOb,tt);',
+    '  float topo=uTopo-(dx/uOt)*.055+(n2(vec2(uv.x*7.,4.)+uL*.45)-.5)*.006;',
+    '  dCen=ci-g*.5-dx+tr;dLado=min(dx-(ci+g*.5)+tr,oe-dx+tr);dT=topo-uv.y;',
+    '  float yc=(uTopo-1.)*.5;float my=(uTopo+1.)*.5;',
+    '  cC=vec2(0.,yc);mC=vec2((uCt+uCb)*.5-g*.5,my);',
+    '  cL=vec2((uCt+uOt+uCb+uOb)*.25,yc);mL=vec2((uOt+uOb-uCt-uCb)*.25-g*.25,my);',
+    ' }else{',
+    '  float borda=uOt;float base=-.965+(dx/borda)*.022;',
+    '  float topo=.965-(dx/borda)*.022+(n2(vec2(uv.x*7.,4.)+uL*.45)-.5)*.004;',
+    '  float corte=uCt-(dx/borda)*.05;',
+    '  dT=topo-uv.y;',
+    '  dCen=min(borda-dx+tr,uv.y-(corte+g*.5)+tr);',
+    '  dLado=min(min(borda-dx+tr,dx-g*.5+tr),min(corte-g*.5-uv.y+tr,uv.y-base));',
+    '  dLado=min(dLado,dT);',
+    '  cC=vec2(0.,(.965+uCt)*.5);mC=vec2(borda,(.965-uCt)*.5);',
+    '  cL=vec2(borda*.5,(uCt-.965)*.5);mL=vec2(borda*.5-g*.25,(uCt+.965)*.5);',
+    ' }',
     ' float mCen=smoothstep(0.,px,min(dCen,dT));',
-    ' float mLado=smoothstep(0.,px,min(dLado,dT));',
-    ' float yc=(uTopo-1.)*.5;float my=(uTopo+1.)*.5;',
-    ' vec3 pC=painel(uA1,uB1,vec2(0.,yc),vec2((uCt+uCb)*.5-g*.5,my),uv,uW.y,1.);',
-    ' float lc=(uCt+uOt+uCb+uOb)*.25;float lw=(uOt+uOb-uCt-uCb)*.25-g*.25;',
-    ' vec3 pL;if(uv.x<0.){pL=painel(uA0,uB0,vec2(-lc,yc),vec2(lw,my),uv,uW.x,3.);}else{pL=painel(uA2,uB2,vec2(lc,yc),vec2(lw,my),uv,uW.z,5.);}',
+    ' float mLado=smoothstep(0.,px,dLado<dT?dLado:dT);',
+    ' vec3 pC=painel(uA1,uB1,cC,mC,uv,uW.y,1.);',
+    ' vec3 pL;if(uv.x<0.){pL=painel(uA0,uB0,vec2(-cL.x,cL.y),mL,uv,uW.x,3.);}else{pL=painel(uA2,uB2,cL,mL,uv,uW.z,5.);}',
     ' vec3 dentro=mCen>.5?pC:pL;float m=max(mCen,mLado);',
-    /* linhas de foco viram nanquim por cima da arte, só nas bordas externas */
-    ' float fi=f*smoothstep(1.05,1.75,length(q));dentro=mix(dentro,NEGRO,fi*.92);',
     ' cor=mix(cor,dentro,m);',
     /* fio de osso em volta de cada painel */
     ' float bC=1.-smoothstep(px*.9,px*2.,abs(min(dCen,dT)));',
     ' float bL=1.-smoothstep(px*.9,px*2.,abs(min(dLado,dT)));',
     ' cor=mix(cor,OSSO,max(bC,bL)*.92);',
-    /* base some no preto para o logo respirar */
-    ' float fade=smoothstep(-.98,-.3,uv.y);cor=mix(NEGRO,cor,fade);',
-    /* sombra elíptica atrás do logo: a arte continua viva nas pontas e o nome fica limpo */
-    ' vec2 lq=(uv-vec2(0.,-.42))/vec2(min(1.25,A*1.05),.40);float som=1.-smoothstep(.35,1.25,length(lq));cor=mix(cor,NEGRO,som*.9);',
-    ' float teto=smoothstep(.72,.98,uv.y)*(1.-m*0.);cor=mix(cor,NEGRO,teto*.72);',
+    /* no tríptico a base some no preto e o logo ganha uma sombra; na página ele fica fora dos quadros */
+    ' if(uPag<.5){',
+    '  float fade=smoothstep(-.98,-.3,uv.y);cor=mix(NEGRO,cor,fade);',
+    '  vec2 lq=(uv-vec2(0.,-.42))/vec2(min(1.25,A*1.05),.40);float som=1.-smoothstep(.35,1.25,length(lq));cor=mix(cor,NEGRO,som*.9);',
+    '  float teto=smoothstep(.72,.98,uv.y);cor=mix(cor,NEGRO,teto*.72);',
+    ' }',
     ' gl_FragColor=vec4(cor,1.);}'
   ].join('\n');
 
@@ -80,14 +79,14 @@
     return s;
   }
 
-  /* geometria em função da proporção da tela */
+  /* geometria em função da proporção: abaixo de 1.05 vira página, com ct = altura do corte entre os quadros */
   function medidas(A) {
     if (A >= 1.05) {
       var k = Math.min(A / 1.6, 1.22);
       var ot = 1.40 * k;
-      return { topo: A > 1.3 ? .80 : .84, ct: .50 * k, cb: .44 * k, ot: ot, ob: ot * .93, gut: .026 };
+      return { pag: 0, topo: A > 1.3 ? .80 : .84, ct: .50 * k, cb: .44 * k, ot: ot, ob: ot * .93, gut: .026 };
     }
-    return { topo: .80, ct: A * .68, cb: A * .60, ot: A * 1.06, ob: A * .99, gut: .022 };
+    return { pag: 1, topo: .965, ct: -.31, cb: 0, ot: A * .955, ob: 0, gut: .024 };
   }
 
   window.heroGL = function (canvas, urls, op) {
@@ -101,7 +100,7 @@
     gl.bindBuffer(gl.ARRAY_BUFFER, gl.createBuffer());
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), gl.STATIC_DRAW);
     var lp = gl.getAttribLocation(pr, 'p'); gl.enableVertexAttribArray(lp); gl.vertexAttribPointer(lp, 2, gl.FLOAT, false, 0, 0);
-    var U = {}; ['uR', 'uL', 'uZ', 'uBal', 'uTopo', 'uCt', 'uCb', 'uOt', 'uOb', 'uGut', 'uW', 'uA0', 'uB0', 'uA1', 'uB1', 'uA2', 'uB2'].forEach(function (n) { U[n] = gl.getUniformLocation(pr, n); });
+    var U = {}; ['uR', 'uL', 'uZ', 'uPag', 'uTopo', 'uCt', 'uCb', 'uOt', 'uOb', 'uGut', 'uW', 'uA0', 'uB0', 'uA1', 'uB1', 'uA2', 'uB2'].forEach(function (n) { U[n] = gl.getUniformLocation(pr, n); });
     ['uA0', 'uB0', 'uA1', 'uB1', 'uA2', 'uB2'].forEach(function (n, i) { gl.uniform1i(U[n], i); });
 
     var tex = [[null, null, null], [null, null, null], [null, null, null]]; /* [painel][arte] */
@@ -126,10 +125,9 @@
       gl.viewport(0, 0, canvas.width, canvas.height);
       var A = canvas.width / canvas.height, m = medidas(A);
       gl.uniform2f(U.uR, canvas.width, canvas.height);
-      gl.uniform1f(U.uTopo, m.topo); gl.uniform1f(U.uCt, m.ct); gl.uniform1f(U.uCb, m.cb); gl.uniform1f(U.uOt, m.ot); gl.uniform1f(U.uOb, m.ob); gl.uniform1f(U.uGut, m.gut);
+      gl.uniform1f(U.uPag, m.pag); gl.uniform1f(U.uTopo, m.topo); gl.uniform1f(U.uCt, m.ct); gl.uniform1f(U.uCb, m.cb); gl.uniform1f(U.uOt, m.ot); gl.uniform1f(U.uOb, m.ob); gl.uniform1f(U.uGut, m.gut);
       var ang = f / 180 * Math.PI * 2;
       gl.uniform2f(U.uL, Math.cos(ang) * 2.4, Math.sin(ang) * 2.4);
-      gl.uniform1f(U.uBal, Math.sin(ang) * .012);
       var c = Math.floor(f / 60) % 3, l = f % 60;
       gl.uniform2f(U.uZ, zoom((l / 60 + 1) / 2), zoom(l / 120));
       var w = [0, 1, 2].map(function (i) { return suave((l - 28 - i * 5) / 20); });

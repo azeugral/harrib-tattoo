@@ -7,15 +7,29 @@
   /* ---------- hero ---------- */
   (function () {
     var hero = $('#inicio'), canvas = $('#heroCanvas'), poster = $('#heroPoster');
-    var A = innerWidth / innerHeight, formato = A >= 1.05 ? 'deitado' : A >= .62 ? 'alto' : 'pe';
-    poster.style.backgroundImage = 'url(assets/img/hero-' + formato + '.jpg?v=60)';
-    if (calmo) { canvas.remove(); return; }
+    /* em pé há duas páginas: a alta e, com a barra do navegador comendo a altura, a curta */
+    function curto() { return innerWidth / innerHeight < 1.05 && innerHeight <= 760; }
+    var formato = innerWidth / innerHeight >= 1.05 ? 'deitado' : curto() ? 'curto' : 'pe';
+    hero.classList.toggle('curto', curto());
+    /* o logo só entra depois de decodificado e com a animação já rodando, para nada disputar o primeiro quadro */
+    var entrou = false;
+    function entra() {
+      if (entrou) return;
+      entrou = true;
+      var i = $('#heroLogo'), vai = function () { requestAnimationFrame(function () { hero.classList.add('entrou'); }); };
+      (i.decode ? i.decode() : Promise.resolve()).then(vai, vai);
+    }
+    setTimeout(entra, 1800);
+    poster.style.backgroundImage = 'url(assets/img/hero-' + formato + '.jpg?v=64)';
+    if (calmo) { canvas.remove(); entra(); return; }
     if (toque) {
       canvas.remove();
       var v = document.createElement('video');
       v.muted = true; v.loop = true; v.playsInline = true; v.autoplay = true; v.setAttribute('playsinline', ''); v.setAttribute('aria-hidden', 'true');
-      v.poster = 'assets/img/hero-' + formato + '.jpg?v=60';
-      v.src = 'assets/video/hero-' + formato + '.mp4?v=60';
+      v.poster = 'assets/img/hero-' + formato + '.jpg?v=64';
+      v.src = 'assets/video/hero-' + formato + '.mp4?v=64';
+      poster.style.backgroundSize = 'contain';
+      v.addEventListener('playing', entra);
       poster.after(v);
       v.play().catch(function () {});
       return;
@@ -25,7 +39,8 @@
     if (!T) { canvas.remove(); return; }
     var L = 'ecd', prontas = 0, tempo = 0, vis = true, ultimo = 0, pedido = 0, escala = 1, soma = 0, conta = 0;
     function mede() {
-      var d = Math.min(devicePixelRatio || 1, 2) * escala, w = Math.round(hero.clientWidth * d), h = Math.round(hero.clientHeight * d);
+      hero.classList.toggle('curto', curto());
+      var d = Math.min(devicePixelRatio || 1, 2) * escala, w = Math.round(canvas.clientWidth * d), h = Math.round(canvas.clientHeight * d);
       /* limite de GPU: 4 MP bastam para o painel continuar nítido */
       var k = Math.min(1, Math.sqrt(4e6 / (w * h)));
       canvas.width = Math.round(w * k); canvas.height = Math.round(h * k);
@@ -58,6 +73,7 @@
         prontas++;
         if (prontas === 3) {
           pedido = requestAnimationFrame(quadro);
+          setTimeout(entra, 700);
           for (var q = 0; q < 3; q++) { sobe(q, 1); sobe(q, 2); }
         }
       });
@@ -176,6 +192,7 @@
     var arco = $('#evolucao'), pista = $('#pista'), max = 0, ativo = false;
     function pode() { return innerWidth >= 1000 && innerHeight >= 640 && !calmo; }
     function mede() {
+      hero.classList.toggle('curto', curto());
       ativo = pode();
       arco.classList.toggle('fixo', ativo);
       if (!ativo) { arco.style.height = ''; pista.style.transform = ''; return; }
