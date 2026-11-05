@@ -192,7 +192,6 @@
     var arco = $('#evolucao'), pista = $('#pista'), max = 0, ativo = false;
     function pode() { return innerWidth >= 1000 && innerHeight >= 640 && !calmo; }
     function mede() {
-      hero.classList.toggle('curto', curto());
       ativo = pode();
       arco.classList.toggle('fixo', ativo);
       if (!ativo) { arco.style.height = ''; pista.style.transform = ''; return; }
